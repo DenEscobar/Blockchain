@@ -5,7 +5,7 @@ import sys
 
 
 # TODO: Implement functionality to search for a proof 
-def proof_of_work(self, last_proof):
+def proof_of_work(last_block_string):
         """
         Simple Proof of Work Algorithm
         Find a number p such that hash(last_block_string, p) contains 6 leading
@@ -13,19 +13,19 @@ def proof_of_work(self, last_proof):
         """
         print("starting on a new proof...")
         proof = 0
-        while valid_proof(last_proof, proof) is False :
+        while valid_proof(last_block_string, proof) is False :
             proof += 1
         print("sending to server...")
         return proof
 
 
-def valid_proof(last_proof, proof):
+def valid_proof(last_block_string, proof):
     """
     Validates the Proof:  Does hash(block_string, proof) contain 6
     leading zeroes?
     """
     # TODO
-    guess =f'{last_proof}{proof}'.encode()
+    guess =f'{last_block_string}{proof}'.encode()
     guess_hash = hashlib.sha256(guess).hexdigest()
     beg = guess_hash[0:6]
     if beg == "000000":
@@ -46,21 +46,25 @@ if __name__ == '__main__':
     # Run forever until interrupted
     while True:
         # TODO: Get the last proof from the server and look for a new one
-        last_proof = requests.get(url = node+"/last_proof")#Still need to request new proof from server
-        new_proof = proof_of_work(last_proof)
+        r = requests.get(url = node+"/last_block_string")#Still need to request new proof from server
+        data = r.json()
+        last_block_string = data['last_block_string']['previous_hash']
 
+        print(last_block_string)
+        new_proof = proof_of_work(last_block_string)
 
         # TODO: When found, POST it to the server {"proof": new_proof}
         # TODO: We're going to have to research how to do a POST in Python
         # HINT: Research `requests` and remember we're sending our data as JSON
 
-        data = {'proof': new_proof}
-        r = requests.post(url = node+"/mine", data = data)
+        proof_data = {'proof': new_proof}
+        r = requests.post(url = node+"/mine", json = proof_data)
+        data = r.json()
         # TODO: If the server responds with 'New Block Forged'
         # add 1 to the number of coins mined and print it.  Otherwise,
         # print the message from the server.
-        if r.message == "New Block Forged":
+        if data.get('message')== "New Block Forged":
             coins.mined += 1
             print("Coins:" + str(coins.mined))
-        print(r.message)
+        print(data.get('message')
         pass
