@@ -66,5 +66,5 @@ if __name__ == '__main__':
         if data.get('message')== "New Block Forged":
             coins.mined += 1
             print("Coins:" + str(coins.mined))
-        print(data.get('message')
+        print(data.get('message'))
         pass

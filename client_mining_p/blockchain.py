@@ -92,13 +92,13 @@ class Blockchain(object):
 
 
     @staticmethod
-    def valid_proof(last_proof, proof):
+    def valid_proof(last_block_string, proof):
         """
         Validates the Proof:  Does hash(block_string, proof) contain 6
         leading zeroes?
         """
         # TODO
-        guess =f'{last_proof}{proof}'.encode()
+        guess =f'{last_block_string}{proof}'.encode()
         guess_hash = hashlib.sha256(guess).hexdigest()
         beg = guess_hash[0:6]
         if beg == "000000":
